@@ -3,6 +3,7 @@ import torch
 from exp.exp_main import Exp_Main
 import random
 import numpy as np
+from multiprocessing import freeze_support
 
 fix_seed = 2021
 random.seed(fix_seed)
@@ -29,14 +30,15 @@ parser.add_argument('--enc_in', type=int, default=2, help='encoder input size')
 # optimization
 parser.add_argument('--num_workers', type=int, default=10, help='data loader num workers')
 parser.add_argument('--train_epochs', type=int, default=10, help='train epochs')
-parser.add_argument('--batch_size', type=int, default=1, help='batch size of train input data')
+parser.add_argument('--batch_size', type=int, default=2, help='batch size of train input data')
 parser.add_argument('--patience', type=int, default=3, help='early stopping patience')
-parser.add_argument('--learning_rate', type=float, default=0.0001, help='optimizer learning rate')
+parser.add_argument('--learning_rate', type=float, default=0.001, help='optimizer learning rate')
 parser.add_argument('--loss', type=str, default='mse', help='loss function')
 
 # GPU
 parser.add_argument('--use_gpu', type=bool, default=True, help='use gpu')
 parser.add_argument('--gpu', type=int, default=0, help='gpu')
+
 
 args = parser.parse_args()
 
@@ -48,13 +50,21 @@ print(args)
 Exp = Exp_Main
 setting = 'Global_Wind_Temp'
 
-if args.is_training:
-    exp = Exp(args)  # set experiments
-    print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
-    exp.train(setting)
-    torch.cuda.empty_cache()
-else:
-    exp = Exp(args)  # set experiments
-    print('>>>>>>>predicting : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
-    exp.predict(setting, True)
-    torch.cuda.empty_cache()
+
+def main():
+    if args.is_training:
+        exp = Exp(args)  # set experiments
+        print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
+        exp.train(setting)
+        torch.cuda.empty_cache()
+    else:
+        exp = Exp(args)  # set experiments
+        print('>>>>>>>predicting : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
+        exp.predict(setting, True)
+        torch.cuda.empty_cache()
+
+
+if __name__ == '__main__':
+    freeze_support()
+    main()
+

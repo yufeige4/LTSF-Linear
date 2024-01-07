@@ -27,6 +27,7 @@ class Exp_Main(Exp_Basic):
 
     def _select_optimizer(self):
         model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
+        # model_optim = torch.optim.SGD(self.model.parameters(), lr=self.args.learning_rate, momentum=0.9)
         return model_optim
 
     def _select_criterion(self):
@@ -75,6 +76,7 @@ class Exp_Main(Exp_Basic):
 
         model_optim = self._select_optimizer()
         criterion = self._select_criterion()
+        # scheduler = torch.optim.lr_scheduler.StepLR(model_optim, step_size=30, gamma=0.1)
 
         for epoch in range(self.args.train_epochs):
             iter_count = 0
@@ -111,7 +113,7 @@ class Exp_Main(Exp_Basic):
             if early_stopping.early_stop:
                 print("Early stopping")
                 break
-
+            # scheduler.step(epoch+1)
             adjust_learning_rate(model_optim, epoch + 1, self.args)
 
         best_model_path = path + '/' + 'checkpoint.pth'

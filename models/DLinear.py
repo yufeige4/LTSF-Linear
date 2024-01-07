@@ -49,7 +49,9 @@ class Model(nn.Module):
         self.decompsition = series_decomp(kernel_size)
         self.channels = configs.enc_in
 
-        self.Linear_Seasonal = nn.Linear(self.seq_len, self.pred_len)
+        self.Linear_Seasonal = nn.Sequential(nn.Linear(self.seq_len, self.seq_len),
+                                             nn.ReLU(),
+                                             nn.Linear(self.seq_len, self.pred_len))
         self.Linear_Trend = nn.Linear(self.seq_len, self.pred_len)
 
         self.Linear_Trend_Channel = nn.Linear(self.channels, self.channels)
